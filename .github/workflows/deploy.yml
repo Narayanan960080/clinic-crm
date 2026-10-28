@@ -19,7 +19,6 @@ jobs:
           host: ${{ secrets.GCP_HOST }}
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.GCP_SSH_KEY }}
-          script_stop: true
           script: |
             set -euo pipefail
             APP_DIR=/opt/clinic-crm
