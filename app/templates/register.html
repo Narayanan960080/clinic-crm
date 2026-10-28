@@ -1,0 +1,58 @@
+{% extends "base_app.html" %}
+{% block title %}Patient registration · Clinic CRM{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Patient registration</h1>
+    <p class="sub">Add a new patient and keep their record up to date.</p>
+  </div>
+  <button class="btn btn-line" type="button" id="import-btn">Import patients</button>
+</div>
+<p class="banner" id="import-note" hidden role="status">Import will connect when the clinic database is ready. You can still save a patient below.</p>
+<div class="split">
+  {% if form_error %}<p class="banner error" role="alert">{{ form_error }}</p>{% endif %}
+  <form class="card" id="patient-form" method="post" action="/patients/new" novalidate>
+    <h2>Patient registration</h2>
+    <div class="form-grid">
+      <div class="field"><label for="p1">Full name</label><span class="field-hint">At least 3 letters</span><input id="p1" name="full_name" type="text" placeholder="Patient name" value="{{ form.full_name|default('') }}" data-validate-name required minlength="3"></div>
+      <div class="field picker-field">
+        <label for="p2">Date of birth</label>
+        <button class="picker-trigger is-empty" id="p2" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Select date of birth">Select date of birth</button>
+        <input id="p2-value" name="dob" type="hidden" value="{{ form.dob|default('') }}">
+        <div class="picker" id="dob-picker" hidden role="dialog" aria-label="Choose date of birth">
+          <div class="picker-head">
+            <button type="button" data-cal="prev" aria-label="Previous month">‹</button>
+            <strong id="dob-cal-title"></strong>
+            <button type="button" data-cal="next" aria-label="Next month">›</button>
+          </div>
+          <div class="cal-grid" id="dob-cal-grid"></div>
+        </div>
+      </div>
+      <div class="field"><label for="p3">Phone</label><span class="field-hint">10-digit mobile</span><input id="p3" name="phone" type="tel" placeholder="9876543210" value="{{ form.phone|default('') }}" data-validate-phone required inputmode="numeric"></div>
+      <div class="field"><label for="p4">Email</label><span class="field-hint">Optional</span><input id="p4" name="email" type="email" placeholder="name@email.com" value="{{ form.email|default('') }}" data-validate-email></div>
+      <div class="field wide"><label for="p5">Address</label><span class="field-hint">At least 5 characters</span><input id="p5" name="address" type="text" placeholder="Street, city" value="{{ form.address|default('') }}" data-validate-address required minlength="5"></div>
+      <div class="field wide"><label for="p6">Notes</label><input id="p6" name="notes" type="text" placeholder="Allergies, conditions" value="{{ form.notes|default('') }}"></div>
+    </div>
+    <p class="banner error" id="patient-error" hidden></p>
+    <div class="form-actions">
+      <button class="btn" type="submit">Save patient</button>
+      <a class="btn btn-line" href="/patients">Cancel</a>
+    </div>
+  </form>
+  <section class="card" aria-labelledby="records-heading">
+    <h2 id="records-heading">Patient records</h2>
+    <div class="field">
+      <label for="ps">Search</label>
+      <input id="ps" type="search" placeholder="Search by name or phone">
+    </div>
+    <div class="record-table" id="record-table">
+      <div class="record-head"><span>Name</span><span>Phone</span><span>Last visit</span></div>
+      {% for person in patients %}
+      <div class="record-row" data-name="{{ person.name }}" data-phone="{{ person.phone }}"><span><b>{{ person.name }}</b></span><span>{{ person.phone }}</span><span>{{ person.last_visit }}</span></div>
+      {% endfor %}
+      <p class="empty" id="no-records" {% if patients %}hidden{% endif %}>No patients yet.</p>
+    </div>
+    <div class="pager" style="padding-left:0;padding-right:0"><span id="record-count">Showing 0 of 0</span></div>
+  </section>
+</div>
+{% endblock %}

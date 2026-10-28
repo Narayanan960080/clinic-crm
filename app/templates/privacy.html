@@ -1,0 +1,52 @@
+{% extends "base_public.html" %}
+{% block title %}Privacy policy · Clinic CRM{% endblock %}
+{% block meta %}
+<meta name="description" content="Privacy policy for Clinic CRM by Quantamloop Innovation Private Limited.">
+<link rel="canonical" href="{{ base_url }}/privacy">
+<meta name="robots" content="index, follow">
+{% endblock %}
+{% block body %}
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href="/">
+      {% with size=36 %}{% include "partials/mark.html" %}{% endwith %}
+      <span class="brand-text"><strong>Clinic CRM</strong><span>by Quantamloop Innovation</span></span>
+    </a>
+    <nav class="site-nav site-nav-inline" aria-label="Primary">
+      <a href="/">Home</a>
+      <a class="btn" href="/login">Login</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap legal-page">
+  <h1>Privacy policy</h1>
+  <p class="lede">This policy explains how Clinic CRM handles information when you use our website and clinic tools.</p>
+  <h2>Who we are</h2>
+  <p>Clinic CRM is provided by Quantamloop Innovation Private Limited. For privacy questions, contact us at <a href="mailto:support@quantamloop.example">support@quantamloop.example</a>.</p>
+  <h2>Information you provide</h2>
+  <p>When your clinic uses Clinic CRM, you may enter patient names, contact details, appointment notes and other records needed to run the clinic. You are responsible for collecting patient consent as required by your local laws.</p>
+  <h2>How we use information</h2>
+  <p>We use account and support information to operate the service, respond to requests and improve reliability. We do not sell patient data.</p>
+  <h2>Storage and security</h2>
+  <p>Data is stored on systems we operate or contract with, using access controls and encryption in transit where supported. No online service can guarantee perfect security; please use strong passwords and limit who can sign in.</p>
+  <h2>Retention</h2>
+  <p>We keep information for as long as your clinic uses the service and as needed to meet legal, billing or support obligations. You may request deletion of support correspondence when it is no longer required.</p>
+  <h2>Your choices</h2>
+  <p>Clinic staff can update or remove records they enter, subject to your clinic’s own policies and applicable law. Contact us if you need help with account access or data questions.</p>
+  <h2>Updates</h2>
+  <p>We may update this policy from time to time. The current version is always published on this page.</p>
+  <p class="legal-meta">Last updated: October 2026</p>
+</main>
+<footer class="site-footer">
+  <div class="wrap site-footer-inner">
+    <div class="site-footer-brand">
+      <strong>Clinic CRM</strong>
+      <span>A product of Quantamloop Innovation Private Limited</span>
+    </div>
+    <nav class="site-footer-links" aria-label="Legal">
+      <a href="/privacy" aria-current="page">Privacy policy</a>
+      <a href="/terms">Terms and conditions</a>
+    </nav>
+  </div>
+</footer>
+{% endblock %}

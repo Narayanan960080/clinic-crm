@@ -1,0 +1,62 @@
+{% extends "base_app.html" %}
+{% block title %}Edit patient · Clinic CRM{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Edit patient</h1>
+    <p class="sub">Update contact details, doctor and status for {{ patient.name }}.</p>
+  </div>
+  <a class="btn btn-line" href="/history?patient={{ patient.name|urlencode }}">Back to history</a>
+</div>
+{% if form_error %}<p class="banner error" role="alert">{{ form_error }}</p>{% endif %}
+<form class="card" id="patient-form" method="post" action="/patients/edit" novalidate>
+  <input type="hidden" name="patient_id" value="{{ patient.id }}">
+  <input type="hidden" name="return_patient" value="{{ patient.name }}">
+  <h2>Patient details</h2>
+  <p class="hint">MRN: <b>{{ patient.mrn }}</b></p>
+  <div class="form-grid">
+    <div class="field"><label for="p1">Full name</label><span class="field-hint">At least 3 letters</span><input id="p1" name="full_name" type="text" value="{{ form.full_name|default(patient.name) }}" data-validate-name required minlength="3"></div>
+    <div class="field picker-field">
+      <label for="p2">Date of birth</label>
+      <button class="picker-trigger{% if not form.dob and not patient.dob %} is-empty{% endif %}" id="p2" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Select date of birth">{{ form.dob|default(patient.dob) or "Select date of birth" }}</button>
+      <input id="p2-value" name="dob" type="hidden" value="{{ form.dob|default(patient.dob) }}">
+      <div class="picker" id="dob-picker" hidden role="dialog" aria-label="Choose date of birth">
+        <div class="picker-head">
+          <button type="button" data-cal="prev" aria-label="Previous month">‹</button>
+          <strong id="dob-cal-title"></strong>
+          <button type="button" data-cal="next" aria-label="Next month">›</button>
+        </div>
+        <div class="cal-grid" id="dob-cal-grid"></div>
+      </div>
+    </div>
+    <div class="field"><label for="p3">Phone</label><span class="field-hint">10-digit mobile</span><input id="p3" name="phone" type="tel" value="{{ form.phone|default(patient.phone) }}" data-validate-phone required inputmode="numeric"></div>
+    <div class="field"><label for="p4">Email</label><span class="field-hint">Optional</span><input id="p4" name="email" type="email" value="{{ form.email|default(patient.email) }}" data-validate-email></div>
+    <div class="field wide"><label for="p5">Address</label><span class="field-hint">At least 5 characters</span><input id="p5" name="address" type="text" value="{{ form.address|default(patient.address) }}" data-validate-address required minlength="5"></div>
+    <div class="field"><label for="p7">Doctor</label><input id="p7" name="doctor" type="text" value="{{ form.doctor|default(patient.doctor if patient.doctor != '—' else '') }}"></div>
+    <div class="field">
+      <label for="p8">Department</label>
+      <select id="p8" name="department">
+        {% set dept = form.department|default(patient.department) %}
+        {% for option in ["General", "Cardiology", "Pediatrics", "Orthopedics", "Dermatology"] %}
+        <option value="{{ option }}" {% if dept == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="p9">Status</label>
+      <select id="p9" name="status">
+        {% set st = form.status|default(patient.status) %}
+        {% for option in ["Active", "Follow-up", "New", "Inactive"] %}
+        <option value="{{ option }}" {% if st == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field wide"><label for="p6">Notes</label><input id="p6" name="notes" type="text" value="{{ form.notes|default(patient.notes) }}"></div>
+  </div>
+  <p class="banner error" id="patient-error" hidden></p>
+  <div class="form-actions">
+    <button class="btn" type="submit">Save changes</button>
+    <a class="btn btn-line" href="/history?patient={{ patient.name|urlencode }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends "base_app.html" %}
+{% block title %}Appointments · Clinic CRM{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Appointments</h1>
+    <p class="sub">Schedule and manage visits.</p>
+  </div>
+  <a class="btn" href="#quick-book">Book appointment</a>
+</div>
+{% if notice %}<p class="banner" role="status">{{ notice }}</p>{% endif %}
+<div class="split">
+  <section class="card grow appt-calendar-card">
+    <div class="cal-toolbar">
+      <div>
+        <h2 id="cal-period-title">This week</h2>
+        <p class="hint" id="cal-period-range"></p>
+      </div>
+      <div class="cal-toolbar-actions">
+        <div class="cal-view-toggle" role="tablist" aria-label="Calendar view">
+          <button type="button" role="tab" data-cal-view="week" aria-selected="true">Week</button>
+          <button type="button" role="tab" data-cal-view="month" aria-selected="false">Month</button>
+        </div>
+        <div class="week-nav">
+          <button type="button" id="cal-prev" aria-label="Previous">Previous</button>
+          <button type="button" id="cal-today">Today</button>
+          <button type="button" id="cal-next" aria-label="Next">Next</button>
+        </div>
+      </div>
+    </div>
+    <div id="cal-week-view" class="cal-week-view" role="tabpanel"></div>
+    <div id="cal-month-view" class="cal-month-view" hidden role="tabpanel">
+      <div class="month-cal-shell">
+        <div id="month-cal-mount" class="month-cal-main"></div>
+        <aside id="month-day-panel" class="month-day-panel" aria-labelledby="month-panel-title">
+          <div class="month-day-panel-inner">
+            <p class="month-panel-placeholder" id="month-panel-placeholder">Select a day to view the schedule.</p>
+            <div id="month-panel-content" hidden>
+              <header class="month-panel-head">
+                <p class="month-panel-dow" id="month-panel-dow"></p>
+                <h3 id="month-panel-title"></h3>
+                <p class="hint" id="month-panel-count"></p>
+              </header>
+              <div id="month-panel-list" class="month-panel-list"></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+  <div class="stack">
+    <section class="card">
+      <h2>Today</h2>
+      <div id="today-list">
+        {% for item in today %}
+        {% if item.status in ['pending', 'confirmed'] %}
+        <div class="list-row" data-id="{{ item.id }}" data-patient="{{ item.patient }}" data-time="{{ item.time }}" data-doctor="{{ item.doctor }}" data-reason="{{ item.reason }}" data-payment="{{ item.payment }}" data-date="{{ item.date }}" data-status="{{ item.status }}">
+          <button type="button" class="appt-open" aria-label="Open {{ item.patient }} at {{ item.time }}"><b>{{ item.time }} · {{ item.patient }}</b><span>{{ item.reason }}</span></button>
+          <span class="pill {{ item.payment_class }}">{{ item.payment }}</span>
+          <span class="appt-actions">
+            <form method="post" action="/appointments/status" class="inline-act">
+              <input type="hidden" name="appointment_id" value="{{ item.id }}">
+              <input type="hidden" name="action" value="attended">
+              <input type="hidden" name="next" value="/appointments">
+              <button type="submit" class="text-act">Attended</button>
+            </form>
+            <form method="post" action="/appointments/status" class="inline-act">
+              <input type="hidden" name="appointment_id" value="{{ item.id }}">
+              <input type="hidden" name="action" value="cancel">
+              <input type="hidden" name="next" value="/appointments">
+              <button type="submit" class="text-act danger">Cancel</button>
+            </form>
+          </span>
+        </div>
+        {% else %}
+        <div class="list-row is-{{ item.status }}" data-id="{{ item.id }}" data-patient="{{ item.patient }}" data-time="{{ item.time }}" data-doctor="{{ item.doctor }}" data-reason="{{ item.reason }}" data-payment="{{ item.payment }}" data-date="{{ item.date }}" data-status="{{ item.status }}">
+          <button type="button" class="appt-open" aria-label="Open {{ item.patient }} at {{ item.time }}"><b>{{ item.time }} · {{ item.patient }}</b><span>{{ item.reason }}</span></button>
+          <span class="pill {{ item.payment_class }}">{{ item.payment }}</span>
+          <span class="appt-actions"><span class="pill {% if item.status == 'cancelled' %}pill-inactive{% endif %}">{{ item.visit_status }}</span></span>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="empty-state">
+          <span class="empty-state-icon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+          <p>No appointments today.</p>
+          <span class="hint">Use Quick book to schedule a visit.</span>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    <form class="card" id="quick-book" method="post" action="/appointments/quick-book" novalidate>
+      <h2>Quick book</h2>
+      <div class="field">
+        <label for="q1">Patient</label>
+        <span class="field-hint">At least 3 letters</span>
+        <input id="q1" name="patient" type="text" placeholder="Patient name" required list="patient-suggest" data-validate-name minlength="3">
+        <datalist id="patient-suggest">
+          {% for person in patients %}
+          <option value="{{ person.name }}"></option>
+          {% endfor %}
+        </datalist>
+      </div>
+      <div class="inline-fields book-datetime">
+        <div class="field picker-field">
+          <label for="q2">Date</label>
+          <button class="picker-trigger is-empty" id="q2" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Select a date">Select a date</button>
+          <input id="q2-value" name="date" type="hidden">
+          <div class="picker picker-wide" id="date-picker" hidden role="dialog" aria-label="Choose a date">
+            <div class="picker-head">
+              <button type="button" data-cal="prev" aria-label="Previous month">‹</button>
+              <strong id="cal-title"></strong>
+              <button type="button" data-cal="next" aria-label="Next month">›</button>
+            </div>
+            <div class="cal-grid cal-grid-modern" id="cal-grid"></div>
+          </div>
+        </div>
+        <div class="field picker-field">
+          <label for="q3">Time</label>
+          <button class="picker-trigger is-empty" id="q3" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Select a time">Select a time</button>
+          <input id="q3-value" name="time" type="hidden">
+          <div class="picker picker-wide" id="time-picker" hidden role="dialog" aria-label="Choose a time">
+            <div class="time-grid time-grid-am" id="time-grid"></div>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="q4">Doctor</label>
+        <span class="field-hint">At least 3 letters</span>
+        <input id="q4" name="doctor" type="text" placeholder="Doctor name" required data-validate-name minlength="3">
+      </div>
+      <div class="field">
+        <label for="q5">Problem / reason</label>
+        <textarea class="short" id="q5" name="reason" rows="3" placeholder="Fever, follow-up, knee pain…" required></textarea>
+      </div>
+      <div class="field">
+        <label for="q6">Payment status</label>
+        <select id="q6" name="payment" required>
+          <option value="">Select status</option>
+          <option value="Paid">Paid</option>
+          <option value="Pending">Pending</option>
+          <option value="Unpaid">Unpaid</option>
+        </select>
+      </div>
+      <p class="banner error" id="book-error" {% if not book_error %}hidden{% endif %}>{{ book_error or '' }}</p>
+      <p class="banner" id="book-ok" hidden role="status"></p>
+      <button class="btn" type="submit">Book</button>
+    </form>
+  </div>
+</div>
+<script type="application/json" id="appointments-data">{{ appointments_json|safe }}</script>
+<dialog class="bottom-sheet" id="day-appt-sheet" aria-labelledby="day-sheet-title">
+  <div class="bottom-sheet-head">
+    <div>
+      <h2 id="day-sheet-title">Appointments</h2>
+      <p class="hint" id="day-sheet-date"></p>
+    </div>
+    <button class="btn btn-line" type="button" id="day-sheet-close">Close</button>
+  </div>
+  <div id="day-sheet-list" class="bottom-sheet-list"></div>
+</dialog>
+{% endblock %}

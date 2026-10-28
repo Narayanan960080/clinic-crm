@@ -1,0 +1,195 @@
+{% extends "base_app.html" %}
+{% block title %}Patient history · Clinic CRM{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Patient history</h1>
+    <p class="sub">Review past visits before each consultation.</p>
+  </div>
+  <a class="btn" href="#add-note">Add visit note</a>
+</div>
+{% if notice %}<p class="banner" role="status">{{ notice }}</p>{% endif %}
+{% if form_error %}<p class="banner error" role="alert">{{ form_error }}</p>{% endif %}
+<div class="split">
+  <section class="card profile">
+    <div class="profile-id">
+      <span class="avatar-lg" aria-hidden="true">{{ patient.initials }}</span>
+      <div><b>{{ patient.name }}</b><span class="hint">ID: {{ patient.mrn }}</span></div>
+    </div>
+    {% if patient.dob %}<div class="list-row"><div><b>Date of birth</b><span>{{ patient.dob }}</span></div></div>{% endif %}
+    <div class="list-row"><div><b>Phone</b><span>{{ patient.phone }}</span></div></div>
+    {% if patient.email %}<div class="list-row"><div><b>Email</b><span>{{ patient.email }}</span></div></div>{% endif %}
+    <div class="list-row"><div><b>Doctor</b><span>{{ patient.doctor }} · {{ patient.department }}</span></div></div>
+    <div class="list-row"><div><b>Payment status</b><span class="pill {{ patient.payment_class }}">{{ patient.payment }}</span></div></div>
+    <p class="notes-block"><b>Notes</b><br><span>{{ patient.notes or "No notes on file." }}</span></p>
+    {% if patient.id %}
+    <a class="btn btn-line" href="/patients/edit?id={{ patient.id }}">Edit patient</a>
+    {% else %}
+    <a class="btn btn-line" href="/patients">Choose patient</a>
+    {% endif %}
+  </section>
+  <section class="card grow">
+    <div class="tabs" role="tablist" aria-label="Patient record">
+      <button type="button" role="tab" id="tab-visits" aria-controls="panel-visits" aria-selected="true">Visits</button>
+      <button type="button" role="tab" id="tab-rx" aria-controls="panel-rx" aria-selected="false">Prescriptions</button>
+      <button type="button" role="tab" id="tab-docs" aria-controls="panel-docs" aria-selected="false">Documents</button>
+    </div>
+    <div id="panel-visits" role="tabpanel" aria-labelledby="tab-visits">
+      <div class="history-head">
+        <div>
+          <h2 class="visit-list-title">Clinical timeline</h2>
+          <p class="hint history-lead">Attended appointments and visit notes, newest first.</p>
+        </div>
+      </div>
+      <div class="history-feed" id="visited-list" data-patient="{{ patient.name }}">
+        {% for event in patient.history_events %}
+        <article class="history-item history-item--{{ event.kind }}">
+          <div class="history-rail" aria-hidden="true">
+            <span class="history-dot"></span>
+            {% if not loop.last %}<span class="history-stem"></span>{% endif %}
+          </div>
+          <div class="history-body">
+            <div class="history-meta">
+              <span class="history-kind kind-{{ event.kind }}">{{ event.kind_label }}</span>
+              <time datetime="{{ event.when_label }}">{{ event.when_label }}</time>
+            </div>
+            <b class="history-title">{{ event.title }}</b>
+            {% if event.subtitle %}<p class="history-sub">{{ event.subtitle }}</p>{% endif %}
+            {% if event.notes %}<p class="history-notes">{{ event.notes }}</p>{% endif %}
+            {% if event.kind == 'appointment' %}
+            <div class="history-tags">
+              <span class="pill pill-attended">Attended</span>
+              <span class="pill {{ event.payment_class }}">{{ event.payment }}</span>
+            </div>
+            {% endif %}
+          </div>
+        </article>
+        {% else %}
+        <div class="empty-state history-empty">
+          <span class="empty-state-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>
+          </span>
+          <p>No appointments or visit notes yet</p>
+          <span class="hint">Mark an appointment as attended or add a visit note below.</span>
+        </div>
+        {% endfor %}
+      </div>
+      <form id="add-note" class="form-grid history-form" method="post" action="/history/visit" novalidate>
+        <input type="hidden" name="patient" value="{{ patient.name }}">
+        <div class="field"><label for="v-title">Visit title</label><input id="v-title" name="title" type="text" placeholder="Follow-up visit" required></div>
+        <div class="field picker-field">
+          <label for="v-date-btn">Date</label>
+          <button class="picker-trigger is-empty" id="v-date-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Select visit date">Select date</button>
+          <input id="v-date-value" name="date" type="hidden" required>
+          <div class="picker picker-wide" id="visit-date-picker" hidden role="dialog" aria-label="Choose visit date">
+            <div class="picker-head">
+              <button type="button" data-cal="prev" aria-label="Previous month">‹</button>
+              <strong id="visit-cal-title"></strong>
+              <button type="button" data-cal="next" aria-label="Next month">›</button>
+            </div>
+            <div class="cal-grid cal-grid-modern" id="visit-cal-grid"></div>
+          </div>
+        </div>
+        <div class="field wide"><label for="v-notes">Notes</label><input id="v-notes" name="notes" type="text" placeholder="Visit notes" required></div>
+        <p class="banner error" id="visit-error" hidden></p>
+        <div class="form-actions"><button class="btn" type="submit">Save note</button></div>
+      </form>
+    </div>
+    <div id="panel-rx" role="tabpanel" aria-labelledby="tab-rx" hidden>
+      <h2 class="visit-list-title">Prescriptions</h2>
+      <p class="hint history-lead">Medications prescribed for this patient.</p>
+      <div class="record-list">
+        {% for rx in patient.prescriptions %}
+        <article class="record-card">
+          <div class="record-card-head">
+            <span class="history-kind kind-visit">Rx</span>
+            <time>{{ rx.date }}</time>
+          </div>
+          <b>{{ rx.medication }}</b>
+          <p class="history-sub">Dosage: {{ rx.dosage }}</p>
+          {% if rx.instructions %}<p class="history-notes">{{ rx.instructions }}</p>{% endif %}
+        </article>
+        {% else %}
+        <p class="empty">No prescriptions on file.</p>
+        {% endfor %}
+      </div>
+      {% if patient.id %}
+      <form id="rx-form" class="form-grid history-form" method="post" action="/history/prescription" novalidate>
+        <input type="hidden" name="patient" value="{{ patient.name }}">
+        <div class="field"><label for="rx-med">Medication</label><input id="rx-med" name="medication" type="text" placeholder="Amoxicillin" required></div>
+        <div class="field"><label for="rx-dose">Dosage</label><input id="rx-dose" name="dosage" type="text" placeholder="500 mg · twice daily" required></div>
+        <div class="field picker-field">
+          <label for="rx-date-btn">Prescribed on</label>
+          <button class="picker-trigger is-empty" id="rx-date-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Select prescription date">Select date</button>
+          <input id="rx-date-value" name="date" type="hidden" required>
+          <div class="picker picker-wide" id="rx-date-picker" hidden role="dialog" aria-label="Choose prescription date">
+            <div class="picker-head">
+              <button type="button" data-cal="prev" aria-label="Previous month">‹</button>
+              <strong id="rx-cal-title"></strong>
+              <button type="button" data-cal="next" aria-label="Next month">›</button>
+            </div>
+            <div class="cal-grid cal-grid-modern" id="rx-cal-grid"></div>
+          </div>
+        </div>
+        <div class="field wide"><label for="rx-notes">Instructions</label><input id="rx-notes" name="instructions" type="text" placeholder="Take after food for 5 days"></div>
+        <p class="banner error" id="rx-error" hidden></p>
+        <div class="form-actions"><button class="btn" type="submit">Add prescription</button></div>
+      </form>
+      {% endif %}
+    </div>
+    <div id="panel-docs" role="tabpanel" aria-labelledby="tab-docs" hidden>
+      <h2 class="visit-list-title">Documents</h2>
+      <p class="hint history-lead">Reports, scans and files (PDF, images, Word — max 5 MB).</p>
+      <div class="record-list">
+        {% for doc in patient.documents %}
+        <article class="record-card record-card--doc">
+          <div class="record-card-head">
+            <span class="history-kind kind-appointment">File</span>
+            <time>{{ doc.uploaded }}</time>
+          </div>
+          <b>{{ doc.label }}</b>
+          <p class="history-sub">{{ doc.name }} · {{ doc.size_kb }} KB</p>
+          <a class="btn btn-line btn-sm" href="/patients/documents/{{ doc.id }}">Download</a>
+        </article>
+        {% else %}
+        <p class="empty">No documents on file.</p>
+        {% endfor %}
+      </div>
+      {% if patient.id %}
+      <form id="doc-form" class="form-grid history-form" method="post" action="/history/document" enctype="multipart/form-data" novalidate>
+        <input type="hidden" name="patient" value="{{ patient.name }}">
+        <div class="field"><label for="doc-label">Label</label><input id="doc-label" name="label" type="text" placeholder="Blood test report"></div>
+        <div class="field wide">
+          <label for="doc-file">File</label>
+          <input id="doc-file" name="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,application/pdf,image/*" required>
+        </div>
+        <p class="banner error" id="doc-error" hidden></p>
+        <div class="form-actions"><button class="btn" type="submit">Upload document</button></div>
+      </form>
+      {% endif %}
+    </div>
+  </section>
+  <div class="side-col">
+    <section class="card">
+      <h2>Next appointment</h2>
+      {% if patient.next %}
+      <b class="next-time">{{ patient.next.when }}</b>
+      <span class="hint">{{ patient.next.detail }}</span>
+      <span class="hint">Problem: {{ patient.next.problem }}</span>
+      <span class="pill {{ patient.next.payment_class }}">{{ patient.next.payment }}</span>
+      <a class="btn btn-line" href="/appointments">Reschedule</a>
+      {% else %}
+      <p class="empty">No upcoming appointment.</p>
+      <a class="btn btn-line" href="/appointments">Book appointment</a>
+      {% endif %}
+    </section>
+    <section class="card">
+      <h2>Visit summary</h2>
+      <div class="list-row"><div><b>Timeline records</b><span id="visit-total">{{ patient.history_events|length }}</span></div></div>
+      <div class="list-row"><div><b>Appointments attended</b><span>{{ patient.visited|length }}</span></div></div>
+      <div class="list-row"><div><b>Last visit</b><span>{{ patient.last_visit }}</span></div></div>
+      <div class="list-row"><div><b>Pending follow-up</b><span>{{ "Yes" if patient.status == "Follow-up" else "No" }}</span></div></div>
+    </section>
+  </div>
+</div>
+{% endblock %}

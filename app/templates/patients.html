@@ -1,0 +1,74 @@
+{% extends "base_app.html" %}
+{% block title %}Patients · Clinic CRM{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="crumb">CLINIC CRM &gt; <b>PATIENTS</b></p>
+    <h1>Patient list</h1>
+  </div>
+  <div class="actions">
+    <button class="btn btn-line" type="button" id="export-btn">Export</button>
+    <a class="btn" href="/patients/new">New patient</a>
+  </div>
+</div>
+{% if notice %}<p class="banner" role="status">{{ notice }}</p>{% endif %}
+<section class="stats" aria-label="Patient totals">
+  <article class="stat-tile">
+    <span class="stat-ico green" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 11a3 3 0 1 0 0-6M22 21a6 6 0 0 0-4-5.6"/></svg></span>
+    <div><b id="stat-total-patients">{{ stats.total }}</b><span>Total patients</span></div>
+  </article>
+  <article class="stat-tile">
+    <span class="stat-ico amber" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M19 8v6M16 11h6"/></svg></span>
+    <div><b id="stat-new-week">{{ stats.new_week }}</b><span>New this week</span></div>
+  </article>
+  <article class="stat-tile">
+    <span class="stat-ico red" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2L12 3zM12 10v5M12 18v.01"/></svg></span>
+    <div><b>0</b><span>Follow-ups due</span></div>
+  </article>
+  <article class="stat-tile">
+    <span class="stat-ico violet" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+    <div><b>0</b><span>Visits today</span></div>
+  </article>
+</section>
+<section class="card" id="patient-table" style="padding:0;display:flex;flex-direction:column;min-height:420px">
+  <div class="toolbar">
+    <label class="sr-only" for="patient-search">Search patients</label>
+    <input class="search" id="patient-search" type="search" placeholder="Search patients, phone, MRN…" value="{{ q|default('') }}">
+    <div class="filters">
+      {% for name, options in [
+        ("Status", ["Active", "Follow-up", "New", "Inactive"]),
+        ("Department", ["General", "Cardiology", "Pediatrics", "Orthopedics", "Dermatology"])
+      ] %}
+      <details class="filter">
+        <summary>{{ name }} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5A6A5E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+        <div class="filter-menu" role="group" aria-label="{{ name }}">
+          <button type="button" data-filter="{{ name|lower }}" data-value="">All</button>
+          {% for option in options %}
+          <button type="button" data-filter="{{ name|lower }}" data-value="{{ option }}">{{ option }}</button>
+          {% endfor %}
+        </div>
+      </details>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="table-head">
+    <div class="c-patient">PATIENT</div><div class="c-id">ID</div><div class="c-doc">DOCTOR</div><div class="c-dept">DEPARTMENT</div><div class="c-status">STATUS</div><div class="c-pay">PAYMENT</div><div class="c-visit">LAST VISIT</div>
+  </div>
+  {% for person in patients %}
+  <div class="prow" data-name="{{ person.name }}" data-phone="{{ person.phone }}" data-mrn="{{ person.mrn }}" data-status="{{ person.status }}" data-doctor="{{ person.doctor }}" data-department="{{ person.department }}" data-date="{{ person.last_visit }}" data-payment="{{ person.payment }}">
+    <div class="c-patient"><div class="person"><span class="avatar-sm" aria-hidden="true">{{ person.initials }}</span><div><b><a href="/history?patient={{ person.name|replace(' ', '+') }}">{{ person.name }}</a></b><span>{{ person.phone }}</span></div></div></div>
+    <div class="c-id">MRN: {{ person.mrn }}</div>
+    <div class="c-doc"><b>{{ person.doctor }}</b><span>{{ person.department }}</span></div>
+    <div class="c-dept"><span class="pill pill-{{ person.dept_key }}">{{ person.department }}</span></div>
+    <div class="c-status"><span class="pill pill-{{ person.status_key }}">{{ person.status }}</span></div>
+    <div class="c-pay"><span class="pill {{ person.payment_class }}">{{ person.payment }}</span></div>
+    <div class="c-visit"><b>{{ person.last_visit }}</b><span>{{ person.last_time }}</span></div>
+  </div>
+  {% endfor %}
+  <p class="empty" id="no-patients" style="padding:16px 24px" {% if patients %}hidden{% endif %}>No patients yet.</p>
+  <div class="pager">
+    <span id="page-count">Showing 0 of 0</span>
+    <span><button type="button" disabled>Previous</button> · <b>1</b> &nbsp; 2 &nbsp; 3 &nbsp;· <button type="button" disabled>Next</button></span>
+  </div>
+</section>
+{% endblock %}

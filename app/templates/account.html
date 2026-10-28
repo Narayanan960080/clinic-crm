@@ -1,0 +1,49 @@
+{% extends "base_app.html" %}
+{% block title %}Account · Clinic CRM{% endblock %}
+{% block content %}
+<div>
+  <h1>Account</h1>
+  <p class="sub">One user account for your clinic.</p>
+</div>
+<div class="split">
+  <div class="stack" style="flex:1">
+    <form class="card" id="profile-form" novalidate>
+      <h2>Profile</h2>
+      <div class="form-grid">
+        <div class="field"><label for="a1">Full name</label><span class="field-hint">At least 3 letters</span><input id="a1" name="name" type="text" placeholder="Your name" value="Dr. Name" data-validate-name required minlength="3"></div>
+        <div class="field"><label for="a-user">Username</label><input id="a-user" name="username" type="text" value="lakshmi" readonly></div>
+        <div class="field"><label for="a2">Email</label><span class="field-hint">Optional</span><input id="a2" name="email" type="email" placeholder="you@clinic.com" value="dr.name@clinic.com" data-validate-email></div>
+        <div class="field"><label for="a3">Clinic name</label><span class="field-hint">At least 3 letters</span><input id="a3" name="clinic" type="text" placeholder="Clinic name" value="Clinic name" data-validate-name required minlength="3"></div>
+        <div class="field"><label for="a4">Phone</label><span class="field-hint">10-digit mobile</span><input id="a4" name="phone" type="tel" placeholder="9876543210" value="+91 98450 10000" data-validate-phone required inputmode="numeric"></div>
+      </div>
+      <p class="banner" id="profile-ok" hidden role="status">Profile saved.</p>
+      <p class="banner error" id="profile-error" hidden></p>
+      <div class="form-actions"><button class="btn" type="submit">Save changes</button></div>
+    </form>
+    <form class="card" id="password-form" novalidate>
+      <h2>Password</h2>
+      <div class="form-grid">
+        <div class="field"><label for="a5">Current password</label><input id="a5" name="current" type="password" placeholder="••••••••" autocomplete="current-password" required></div>
+        <div class="field"><label for="a6">New password</label><input id="a6" name="new" type="password" placeholder="New password" autocomplete="new-password" required></div>
+      </div>
+      <p class="banner" id="password-ok" hidden role="status">Password updated.</p>
+      <p class="banner error" id="password-error" hidden></p>
+      <div class="form-actions"><button class="btn btn-line" type="submit">Update password</button></div>
+    </form>
+  </div>
+  <div class="side-col">
+    <section class="card">
+      <h2>Your plan</h2>
+      <div class="row-between"><b style="font-size:18px">One user account</b><span class="pill">Active</span></div>
+      <p class="hint" style="margin-top:8px;font-size:14px;line-height:1.5">Includes CRM access and basic support.</p>
+    </section>
+    <section class="card">
+      <h2>Account</h2>
+      <div class="list-row"><div><b>Role</b><span>Admin</span></div></div>
+      <div class="list-row"><div><b>Clinic</b><span>Clinic name</span></div></div>
+      <div class="list-row"><div><b>Last login</b><span>Today · 09:00</span></div></div>
+      <a class="btn btn-line" href="/logout" style="margin-top:16px">Log out</a>
+    </section>
+  </div>
+</div>
+{% endblock %}

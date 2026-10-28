@@ -1,0 +1,124 @@
+{% extends "base_public.html" %}
+{% block title %}Clinic CRM – by Quantamloop Innovation{% endblock %}
+{% block meta %}
+<meta name="description" content="Clinic CRM is patient management software for small clinics: appointment scheduling for clinics, patient records, and visit history in one login.">
+<link rel="canonical" href="{{ base_url }}/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Clinic CRM – by Quantamloop Innovation">
+<meta property="og:description" content="Patients, appointments and history in one simple place.">
+<meta property="og:url" content="{{ base_url }}/">
+<meta property="og:image" content="{{ base_url }}/static/favicon.svg">
+<meta property="og:image:alt" content="Clinic CRM logo, a lime square with a dark green plus">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Clinic CRM – by Quantamloop Innovation">
+<meta name="twitter:description" content="Patients, appointments and history in one simple place.">
+<meta name="twitter:image" content="{{ base_url }}/static/favicon.svg">
+<script type="application/ld+json">{{ json_ld|safe }}</script>
+{% endblock %}
+{% block head %}
+<style>
+  .site-header,.hero{background:#F4F5F3}
+</style>
+{% endblock %}
+{% block body %}
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href="/">
+      {% with size=36 %}{% include "partials/mark.html" %}{% endwith %}
+      <span class="brand-text"><strong>Clinic CRM</strong><span>by Quantamloop Innovation</span></span>
+    </a>
+    <button class="nav-burger" type="button" id="nav-burger" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav class="site-nav" id="site-nav" aria-label="Primary">
+      <a href="#features">Features</a>
+      <a href="#support">Support</a>
+      <a class="btn" href="/login">Login</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="page-marketing">
+  <div class="wrap hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Built for clinics</span>
+      <h1>Patients, appointments and history in one simple place.</h1>
+      <p class="lede">Clinic CRM helps your front desk register patients, schedule visits and look up past records quickly, so your team spends less time on paperwork.</p>
+      <div class="hero-actions">
+        <a class="btn btn-lg" href="/login">Login to your CRM</a>
+        <a class="btn btn-lg btn-line" href="#features">See features</a>
+      </div>
+    </div>
+    <div class="preview-card">
+      <div class="preview-head"><strong>Today's appointments</strong></div>
+      <p class="empty">No appointments yet.</p>
+    </div>
+  </div>
+
+  <section class="features" id="features">
+    <div class="wrap features-inner">
+      <div class="section-intro">
+        <h2>Everything a clinic needs to start</h2>
+        <p>A focused set of tools for day-to-day clinic work.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature">
+          <svg class="icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21v-1a6 6 0 0 1 12 0v1M19 8v6M16 11h6"/></svg>
+          <h3>Patient registration and records</h3>
+          <p>Register new patients in moments and keep every record organised and easy to find.</p>
+        </article>
+        <article class="feature" id="scheduling">
+          <svg class="icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+          <h3>Appointment scheduling</h3>
+          <p>Book, view and manage appointments so your day runs on time.</p>
+        </article>
+        <article class="feature">
+          <svg class="icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <h3>Patient history</h3>
+          <p>See past visits at a glance before every consultation.</p>
+        </article>
+        <article class="feature">
+          <svg class="icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          <h3>One user account</h3>
+          <p>A single account to sign in and manage your clinic.</p>
+        </article>
+        <article class="feature" id="support">
+          <svg class="icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2" y="14" width="5" height="6" rx="2"/><rect x="17" y="14" width="5" height="6" rx="2"/></svg>
+          <h3>CRM access and basic support</h3>
+          <p>Full CRM access with basic support from our team whenever you need help.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap home-login" id="login" aria-labelledby="welcome-heading">
+    <div class="login-blurb">
+      <h2 id="welcome-heading">Welcome back</h2>
+      <p>Sign in to open your patients, appointments and records.</p>
+    </div>
+    <form class="login-card" id="home-login" action="/login" method="post" novalidate>
+      <div class="field">
+        <label for="em">Mobile or username</label>
+        <input id="em" name="username" type="text" placeholder="9876543210 or lakshmi" autocomplete="username" required inputmode="text">
+      </div>
+      <div class="field">
+        <label for="pw">Password</label>
+        <input id="pw" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
+      </div>
+      <p class="banner error" id="home-login-error" hidden></p>
+      <button class="btn" type="submit">Login</button>
+      <a class="center-link" href="/login">Forgot password?</a>
+    </form>
+  </section>
+</main>
+<footer class="site-footer">
+  <div class="wrap site-footer-inner">
+    <div class="site-footer-brand">
+      <strong>Clinic CRM</strong>
+      <span>A product of Quantamloop Innovation Private Limited</span>
+    </div>
+    <nav class="site-footer-links" aria-label="Legal">
+      <a href="/privacy">Privacy policy</a>
+      <a href="/terms">Terms and conditions</a>
+    </nav>
+  </div>
+</footer>
+<script src="/static/js/app.js?v=29" defer></script>
+{% endblock %}

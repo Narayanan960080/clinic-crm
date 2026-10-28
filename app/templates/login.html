@@ -1,0 +1,50 @@
+{% extends "base_public.html" %}
+{% block title %}Login · Clinic CRM{% endblock %}
+{% block body %}
+<main class="login-screen" id="main">
+  <section class="login-panel">
+    <a class="brand" href="/">
+      {% with size=40 %}{% include "partials/mark.html" %}{% endwith %}
+      <strong>Clinic CRM</strong>
+    </a>
+    <div>
+      <h1>Run your clinic from one simple place.</h1>
+      <ul class="checks">
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#86C440" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Patient registration and records</li>
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#86C440" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Appointment scheduling</li>
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#86C440" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Patient history</li>
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#86C440" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>One user account</li>
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#86C440" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>CRM access and basic support</li>
+      </ul>
+    </div>
+    <span class="fine">by Quantamloop Innovation Private Limited</span>
+  </section>
+  <section class="login-main">
+    <div class="login-box">
+      <div>
+        <h2>Welcome back</h2>
+        <p class="sub">Sign in to open your clinic dashboard.</p>
+      </div>
+      <form class="login-form" id="login-form" action="/login" method="post" novalidate>
+        <div class="field">
+          <label for="l1">Mobile or username</label>
+          <input id="l1" name="username" type="text" placeholder="9876543210 or lakshmi" autocomplete="username" required inputmode="text">
+        </div>
+        <div class="field">
+          <label for="l2">Password</label>
+          <input id="l2" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
+        </div>
+        <div class="check-row">
+          <label><input type="checkbox" name="remember">Remember me</label>
+          <a href="/support">Forgot password?</a>
+        </div>
+        <p class="banner error" id="login-error" {% if not login_error %}hidden{% endif %}>{{ login_error|default('') }}</p>
+        <button class="btn" type="submit">Login</button>
+      </form>
+      <p class="help-line">Need help? <a href="/support">Contact support</a></p>
+    </div>
+  </section>
+</main>
+<script src="/static/js/field-validation.js?v=29" defer></script>
+<script src="/static/js/app.js?v=29" defer></script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base_public.html" %}
+{% block title %}Terms and conditions · Clinic CRM{% endblock %}
+{% block meta %}
+<meta name="description" content="Terms and conditions for using Clinic CRM by Quantamloop Innovation Private Limited.">
+<link rel="canonical" href="{{ base_url }}/terms">
+<meta name="robots" content="index, follow">
+{% endblock %}
+{% block body %}
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href="/">
+      {% with size=36 %}{% include "partials/mark.html" %}{% endwith %}
+      <span class="brand-text"><strong>Clinic CRM</strong><span>by Quantamloop Innovation</span></span>
+    </a>
+    <nav class="site-nav site-nav-inline" aria-label="Primary">
+      <a href="/">Home</a>
+      <a class="btn" href="/login">Login</a>
+    </nav>
+  </div>
+</header>
+<main id="main" class="wrap legal-page">
+  <h1>Terms and conditions</h1>
+  <p class="lede">By using Clinic CRM you agree to these terms. If you do not agree, please do not use the service.</p>
+  <h2>Service</h2>
+  <p>Clinic CRM is clinic management software for registering patients, scheduling appointments and viewing records. Features may change as we improve the product.</p>
+  <h2>Your account</h2>
+  <p>You are responsible for keeping login details secure and for activity under your account. Notify us promptly if you suspect unauthorised access.</p>
+  <h2>Clinic data</h2>
+  <p>You retain ownership of patient and clinic data you enter. You grant us permission to host and process that data only to provide and support the service.</p>
+  <h2>Acceptable use</h2>
+  <p>Do not misuse the service, attempt to break security, upload unlawful content or use Clinic CRM in a way that harms others or violates applicable law.</p>
+  <h2>Support</h2>
+  <p>Basic support is available during published support hours at <a href="mailto:support@quantamloop.example">support@quantamloop.example</a>. We aim to respond within a reasonable time but do not guarantee a specific resolution time.</p>
+  <h2>Availability</h2>
+  <p>We work to keep Clinic CRM available but planned maintenance or outages may occur. We are not liable for indirect losses from temporary unavailability.</p>
+  <h2>Limitation of liability</h2>
+  <p>To the extent permitted by law, our total liability for claims relating to the service is limited to the fees you paid us for Clinic CRM in the twelve months before the claim, or zero if the service is provided without charge.</p>
+  <h2>Governing law</h2>
+  <p>These terms are governed by the laws of India. Courts in India shall have exclusive jurisdiction, subject to mandatory consumer protections where they apply.</p>
+  <h2>Contact</h2>
+  <p>Quantamloop Innovation Private Limited — <a href="mailto:support@quantamloop.example">support@quantamloop.example</a></p>
+  <p class="legal-meta">Last updated: October 2026</p>
+</main>
+<footer class="site-footer">
+  <div class="wrap site-footer-inner">
+    <div class="site-footer-brand">
+      <strong>Clinic CRM</strong>
+      <span>A product of Quantamloop Innovation Private Limited</span>
+    </div>
+    <nav class="site-footer-links" aria-label="Legal">
+      <a href="/privacy">Privacy policy</a>
+      <a href="/terms" aria-current="page">Terms and conditions</a>
+    </nav>
+  </div>
+</footer>
+{% endblock %}

@@ -1,0 +1,42 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: clinic-crm-mysql
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Kolkata
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-clinic_root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-clinic_crm}
+      MYSQL_USER: ${MYSQL_USER:-clinic}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-clinic_pass}
+    command: --default-time-zone=+05:30
+    ports:
+      - "3306:3306"
+    volumes:
+      - clinic_mysql:/var/lib/mysql
+      - ./sql/clinic_crm.sql:/docker-entrypoint-initdb.d/01-clinic_crm.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-clinic_root}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  api:
+    build: .
+    container_name: clinic-crm-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      TZ: Asia/Kolkata
+      DATABASE_URL: mysql+pymysql://${MYSQL_USER:-clinic}:${MYSQL_PASSWORD:-clinic_pass}@mysql:3306/${MYSQL_DATABASE:-clinic_crm}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - clinic_uploads:/app/app/uploads
+
+volumes:
+  clinic_mysql:
+  clinic_uploads:

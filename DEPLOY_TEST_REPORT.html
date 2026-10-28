@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clinic CRM — Deploy &amp; Test Report</title>
+  <style>
+    :root {
+      --bg: #f4f7f4;
+      --paper: #fff;
+      --ink: #1a2e22;
+      --muted: #5a6a5e;
+      --line: #dce6dc;
+      --brand: #2d6a4f;
+      --brand-light: #d8f3dc;
+      --pass: #1b7a4e;
+      --pass-bg: #e8f5ee;
+      --warn: #9a6700;
+      --warn-bg: #fef7e6;
+      --skip: #6b7280;
+      --skip-bg: #f3f4f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 32px 20px 64px;
+    }
+    header.report-head {
+      background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      box-shadow: 0 8px 24px rgba(27, 67, 50, 0.18);
+    }
+    header.report-head h1 {
+      margin: 0 0 8px;
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    header.report-head .meta {
+      opacity: 0.92;
+      font-size: 0.95rem;
+    }
+    header.report-head a {
+      color: #b7e4c7;
+    }
+    section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
+    }
+    section h2 {
+      margin: 0 0 16px;
+      font-size: 1.15rem;
+      color: var(--brand);
+      border-bottom: 2px solid var(--brand-light);
+      padding-bottom: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      background: var(--bg);
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    tr:last-child td { border-bottom: none; }
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-pass { background: var(--pass-bg); color: var(--pass); }
+    .badge-warn { background: var(--warn-bg); color: var(--warn); }
+    .badge-skip { background: var(--skip-bg); color: var(--skip); }
+    .badge-ok { background: var(--brand-light); color: var(--brand); }
+    ul.routes {
+      margin: 0;
+      padding-left: 1.25rem;
+      columns: 2;
+      column-gap: 24px;
+    }
+    @media (max-width: 600px) {
+      ul.routes { columns: 1; }
+    }
+    ol.smoke {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+    ol.smoke li { margin-bottom: 8px; }
+    .callout {
+      background: var(--brand-light);
+      border-left: 4px solid var(--brand);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 16px;
+      font-size: 0.92rem;
+    }
+    .signoff-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 16px;
+      font-size: 0.95rem;
+    }
+    .signoff-grid dt { font-weight: 600; color: var(--muted); margin: 0; }
+    .signoff-grid dd { margin: 0; text-align: right; font-weight: 600; }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 32px;
+    }
+    code {
+      font-size: 0.88em;
+      background: var(--bg);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="report-head">
+      <h1>Clinic CRM — Deploy &amp; Test Report</h1>
+      <p class="meta">
+        <strong>Date:</strong> 27 October 2026 (IST)<br>
+        <strong>Environment:</strong> GCP VM <code>qtl-clinic-crm</code><br>
+        <strong>Live URL:</strong> <a href="http://35.255.220.44:8000">http://35.255.220.44:8000</a><br>
+        <strong>Deploy:</strong> App tarball + Docker API rebuild; MySQL persistence enabled (PyMySQL)
+      </p>
+    </header>
+
+    <section id="deploy">
+      <h2>Deploy summary</h2>
+      <table>
+        <thead><tr><th>Item</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Files synced to <code>/opt/clinic-crm</code></td><td><span class="badge badge-ok">OK</span></td></tr>
+          <tr><td><code>docker compose build api</code></td><td><span class="badge badge-ok">OK</span></td></tr>
+          <tr><td><code>docker compose up -d</code></td><td><span class="badge badge-ok">OK</span></td></tr>
+          <tr><td><code>clinic-crm-api</code></td><td>Up, port <strong>8000</strong> published</td></tr>
+          <tr><td><code>clinic-crm-mysql</code></td><td>Up, healthy, <strong>3306 not published</strong> to host</td></tr>
+          <tr><td>Container restart policy</td><td><code>unless-stopped</code> (api + mysql)</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="release">
+      <h2>Release markers (live)</h2>
+      <table>
+        <thead><tr><th>Check</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Marketing CSS <code>main.css?v=14</code></td><td><span class="badge badge-pass">Pass</span></td></tr>
+          <tr><td>App pages JS <code>app.js?v=15</code></td><td><span class="badge badge-pass">Pass</span></td></tr>
+          <tr><td><code>page-marketing</code> on home</td><td><span class="badge badge-pass">Pass</span></td></tr>
+          <tr><td>Footer: Privacy &amp; Terms</td><td><span class="badge badge-pass">Pass</span></td></tr>
+          <tr><td>DOB picker (<code>dob-picker</code>, <code>p2-value</code>)</td><td><span class="badge badge-pass">Pass</span></td></tr>
+          <tr><td>Sitemap includes <code>/privacy</code></td><td><span class="badge badge-pass">Pass</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="routes">
+      <h2>HTTP route tests (GET)</h2>
+      <p>All returned <strong>200</strong>:</p>
+      <ul class="routes">
+        <li><code>/</code> (marketing)</li>
+        <li><code>/login</code></li>
+        <li><code>/privacy</code></li>
+        <li><code>/terms</code></li>
+        <li><code>/dashboard</code></li>
+        <li><code>/patients</code></li>
+        <li><code>/patients/new</code></li>
+        <li><code>/appointments</code></li>
+        <li><code>/history</code></li>
+        <li><code>/account</code></li>
+        <li><code>/support</code></li>
+        <li><code>/robots.txt</code></li>
+        <li><code>/sitemap.xml</code></li>
+      </ul>
+      <p style="margin-top:12px;margin-bottom:0">Static: <code>/static/css/main.css?v=14</code>, <code>/static/js/app.js?v=15</code> — <span class="badge badge-pass">200</span></p>
+    </section>
+
+    <section id="auth">
+      <h2>Authentication (POST <code>/login</code>)</h2>
+      <table>
+        <thead><tr><th>Case</th><th>Expected</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td><code>lakshmi</code> / <code>123456</code></td><td>303 → <code>/dashboard</code></td><td><span class="badge badge-pass">Pass</span></td></tr>
+          <tr><td><code>dr.name@clinic.com</code> / <code>123456</code></td><td>303 → <code>/dashboard</code></td><td><span class="badge badge-pass">Pass</span></td></tr>
+          <tr><td><code>lakshmi</code> / wrong password</td><td>303 → <code>/login?error=1</code></td><td><span class="badge badge-pass">Pass</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="functional">
+      <h2>UI / functional tests (live site)</h2>
+      <table>
+        <thead><tr><th>Case</th><th>Result</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Home, legal links</td><td><span class="badge badge-pass">Pass</span></td><td></td></tr>
+          <tr><td>Privacy &amp; Terms</td><td><span class="badge badge-pass">Pass</span></td><td>GET 200</td></tr>
+          <tr><td>Patient registration — DOB calendar</td><td><span class="badge badge-pass">Pass</span></td><td>Past dates only; ~25 years back</td></tr>
+          <tr><td><strong>Add patient → list</strong></td><td><span class="badge badge-pass">Pass</span></td><td>MySQL <code>POST /patients/new</code>; e.g. <em>SQL Test Patient</em></td></tr>
+          <tr><td><strong>View patient / history</strong></td><td><span class="badge badge-pass">Pass</span></td><td>Profile from DB; tabs &amp; visit form</td></tr>
+          <tr><td><strong>Appointments — quick book</strong></td><td><span class="badge badge-pass">Pass</span></td><td>MySQL <code>POST /appointments/quick-book</code></td></tr>
+          <tr><td>Login via UI form</td><td><span class="badge badge-skip">Not re-tested</span></td><td>Server POST verified (curl)</td></tr>
+          <tr><td>Cancel / Attended</td><td><span class="badge badge-skip">Not re-tested</span></td><td><code>POST /appointments/status</code> implemented</td></tr>
+          <tr><td>Support / Account forms</td><td><span class="badge badge-skip">Not re-tested</span></td><td>Routes 200</td></tr>
+          <tr><td>Dashboard stats</td><td><span class="badge badge-pass">Pass</span></td><td>Counts from MySQL</td></tr>
+          <tr><td>Mobile marketing layout</td><td><span class="badge badge-pass">Pass</span></td><td>Prior local QA; ~1480px desktop</td></tr>
+          <tr><td>Night VM schedule</td><td><span class="badge badge-skip">Not re-tested</span></td><td><code>clinic-night-pause</code> unchanged</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>Storage (27 Oct):</strong> Patients, appointments, and visit notes persist in <strong>MySQL</strong> (<code>clinic_crm</code>). Browser <code>localStorage</code> is no longer used for clinical data.
+      </div>
+    </section>
+
+    <section id="database">
+      <h2>Database (MySQL on server)</h2>
+      <table>
+        <thead><tr><th>Table</th><th>Status</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>users</code></td><td>1 row</td><td><code>lakshmi</code> / <code>dr.name@clinic.com</code></td></tr>
+          <tr><td><code>patients</code></td><td>Live data</td><td><code>POST /patients/new</code></td></tr>
+          <tr><td><code>appointments</code></td><td>Live data</td><td>Quick book + status updates</td></tr>
+          <tr><td><code>doctors</code></td><td>Auto-created</td><td>On first book by doctor name</td></tr>
+          <tr><td><code>visits</code></td><td>On use</td><td>Visit notes &amp; attended flow</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:14px;margin-bottom:0"><strong>Security:</strong> MySQL <strong>3306</strong> not reachable from public IP. Only API <strong>8000</strong> exposed.</p>
+    </section>
+
+    <section id="limitations">
+      <h2>Known limitations</h2>
+      <ol class="smoke">
+        <li>Clinical data is in <strong>MySQL</strong> (<code>DATABASE_URL</code> in Docker); backups are your MySQL volume / ops process.</li>
+        <li><strong>Login</strong> is still checked in app code; MySQL <code>password_hash</code> not wired to the UI yet.</li>
+        <li><strong>Week calendar</strong> prev/next buttons are placeholders; board shows current Mon–Sat from SQL.</li>
+      </ol>
+    </section>
+
+    <section id="smoke">
+      <h2>Recommended smoke test (~5 min)</h2>
+      <ol class="smoke">
+        <li>Open <a href="http://35.255.220.44:8000">http://35.255.220.44:8000</a> — header, hero, footer legal links.</li>
+        <li>Login: <strong>lakshmi</strong> / <strong>123456</strong> → Dashboard.</li>
+        <li><strong>Patients → New patient</strong> → DOB calendar → Save → confirm on list.</li>
+        <li><strong>Appointments → Quick book</strong> → confirm Today list (same or new browser).</li>
+        <li>Open <strong>Privacy</strong> and <strong>Terms</strong> from footer.</li>
+      </ol>
+    </section>
+
+    <section id="signoff">
+      <h2>Sign-off</h2>
+      <dl class="signoff-grid">
+        <dt>Deploy</dt><dd><span class="badge badge-pass">Complete</span></dd>
+        <dt>Public routes &amp; login</dt><dd><span class="badge badge-pass">Pass</span></dd>
+        <dt>Legal pages &amp; sitemap</dt><dd><span class="badge badge-pass">Pass</span></dd>
+        <dt>DOB date picker</dt><dd><span class="badge badge-pass">Pass</span></dd>
+        <dt>Docker / MySQL exposure</dt><dd><span class="badge badge-pass">Pass</span></dd>
+        <dt>Core CRM ops (SQL-backed)</dt><dd><span class="badge badge-pass">Pass</span></dd>
+      </dl>
+      <p style="margin-top:18px;margin-bottom:0;color:var(--muted);font-size:0.9rem">
+        <strong>Tested by:</strong> Cursor agent (HTTP, curl POST, live browser on production URL)<br>
+        <strong>Companion:</strong> <code>DEPLOY_TEST_REPORT.md</code> · this file <code>DEPLOY_TEST_REPORT.html</code>
+      </p>
+    </section>
+
+    <footer>
+      Quantamloop Innovation Private Limited · Clinic CRM · Report generated 27 Oct 2026
+    </footer>
+  </div>
+</body>
+</html>

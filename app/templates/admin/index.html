@@ -1,0 +1,189 @@
+{% extends "base_public.html" %}
+{% block title %}Platform admin · Clinic CRM{% endblock %}
+{% block meta %}
+<meta name="robots" content="noindex, nofollow">
+{% endblock %}
+{% block body %}
+<div class="admin-shell">
+  <header class="admin-top">
+    <a class="brand" href="/admin">
+      {% with size=32 %}{% include "partials/mark.html" %}{% endwith %}
+      <strong>Clinic CRM Admin</strong>
+    </a>
+    <nav class="admin-nav" aria-label="Admin sections">
+      <a href="#admin-overview">Overview</a>
+      <a href="#admin-manage">Manage</a>
+    </nav>
+    <div class="admin-who">
+      <span class="hint">Signed in as <b>{{ admin_username }}</b></span>
+      <a class="btn btn-line" href="/logout">Log out</a>
+    </div>
+  </header>
+  <main class="admin-main wrap">
+    <div class="page-head">
+      <div>
+        <h1>Platform admin</h1>
+        <p class="sub">Overview, clinics, users, and access control.</p>
+      </div>
+    </div>
+    {% if notice %}<p class="banner" role="status">{{ notice }}</p>{% endif %}
+    {% if form_error %}<p class="banner error" role="alert">{{ form_error }}</p>{% endif %}
+
+    <section class="admin-overview" id="admin-overview">
+      <h2 class="admin-section-title">Dashboard</h2>
+      <div class="stats admin-stats">
+        <article class="stat"><span>Clinics</span><b>{{ overview.clinics_active|default(0) }}<small>/ {{ overview.clinics_total|default(0) }} active</small></b></article>
+        <article class="stat"><span>Clinic users</span><b>{{ overview.users_active|default(0) }}<small>/ {{ overview.users_total|default(0) }} active</small></b></article>
+        <article class="stat"><span>Patients (all clinics)</span><b>{{ overview.patients_total|default(0) }}</b></article>
+      </div>
+      <section class="card admin-chart-card">
+        <h3>Patients by clinic</h3>
+        {% if overview.chart %}
+        <div class="admin-chart" role="img" aria-label="Bar chart of patient counts by clinic">
+          {% for bar in overview.chart %}
+          <div class="admin-chart-col">
+            <div class="admin-chart-bar-wrap">
+              <div class="admin-chart-bar" style="height: {{ bar.pct if bar.pct > 0 else 4 }}%" title="{{ bar.count }} patients"></div>
+            </div>
+            <span class="admin-chart-count">{{ bar.count }}</span>
+            <span class="admin-chart-label">{{ bar.label }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty">No clinic data yet.</p>
+        {% endif %}
+      </section>
+    </section>
+
+    <section id="admin-manage">
+      <h2 class="admin-section-title">Clinics &amp; users</h2>
+    <div class="split admin-split">
+      <section class="card">
+        <h2>Add clinic</h2>
+        <form class="form-grid" id="admin-clinic-form" method="post" action="/admin/clinics" novalidate>
+          <div class="field wide"><label for="c-name">Clinic name</label><span class="field-hint">At least 3 letters</span><input id="c-name" name="name" type="text" placeholder="Sunrise Family Clinic" required value="{{ clinic_form.name|default('') }}" data-validate-name minlength="3"></div>
+          <div class="field"><label for="c-phone">Phone</label><span class="field-hint">Optional · 10 digits</span><input id="c-phone" name="phone" type="tel" placeholder="9876543210" value="{{ clinic_form.phone|default('') }}" data-validate-phone inputmode="numeric"></div>
+          <div class="field wide"><label for="c-address">Address</label><span class="field-hint">Optional · min 5 characters</span><input id="c-address" name="address" type="text" placeholder="Street, city" value="{{ clinic_form.address|default('') }}" data-validate-address minlength="5"></div>
+          <p class="banner error" id="clinic-form-error" role="alert" {% if not clinic_form_error|default('') %}hidden{% endif %}>{{ clinic_form_error|default('') }}</p>
+          <div class="form-actions"><button class="btn" type="submit">Save clinic</button></div>
+        </form>
+      </section>
+      <section class="card">
+        <h2>Add user under clinic</h2>
+        <form class="form-grid admin-user-grid" id="admin-user-form" method="post" action="/admin/users" novalidate>
+          <div class="field wide">
+            <div class="field-meta">
+              <label for="u-clinic">Clinic</label>
+              <span class="field-hint">Required · active clinics only</span>
+            </div>
+            <select id="u-clinic" name="clinic_id" required>
+              <option value="">Select clinic</option>
+              {% for clinic in clinics %}
+              {% if clinic.is_active %}
+              <option value="{{ clinic.id }}" {% if user_form.clinic_id|default('')|string == clinic.id|string %}selected{% endif %}>{{ clinic.name }}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <div class="field-meta">
+              <label for="u-name">Full name</label>
+              <span class="field-hint">At least 3 letters</span>
+            </div>
+            <input id="u-name" name="name" type="text" required value="{{ user_form.name|default('') }}" data-validate-name minlength="3">
+          </div>
+          <div class="field">
+            <div class="field-meta">
+              <label for="u-user">Username</label>
+              <span class="field-hint">3–32 chars · letters, numbers, . _ -</span>
+            </div>
+            <input id="u-user" name="username" type="text" autocomplete="username" required minlength="3" maxlength="32" pattern="[a-zA-Z0-9._-]+" value="{{ user_form.username|default('') }}">
+          </div>
+          <div class="field">
+            <div class="field-meta">
+              <label for="u-phone">Mobile</label>
+              <span class="field-hint">10-digit mobile</span>
+            </div>
+            <input id="u-phone" name="phone" type="tel" required value="{{ user_form.phone|default('') }}" data-validate-phone data-validate-phone-required inputmode="numeric" placeholder="9876543210">
+          </div>
+          <div class="field">
+            <div class="field-meta">
+              <label for="u-email">Email</label>
+              <span class="field-hint">Optional</span>
+            </div>
+            <input id="u-email" name="email" type="email" value="{{ user_form.email|default('') }}" data-validate-email>
+          </div>
+          <div class="field wide">
+            <div class="field-meta">
+              <label for="u-pass">Password</label>
+              <span class="field-hint">Min 6 characters</span>
+            </div>
+            <input id="u-pass" name="password" type="password" autocomplete="new-password" required minlength="6">
+          </div>
+          <p class="banner error" id="user-form-error" role="alert" {% if not user_form_error|default('') %}hidden{% endif %}>{{ user_form_error|default('') }}</p>
+          <div class="form-actions"><button class="btn" type="submit">Save user</button></div>
+        </form>
+        {% if not clinics %}
+        <p class="hint" style="margin-top:12px">Add a clinic first, then create users for it.</p>
+        {% endif %}
+      </section>
+    </div>
+    <div class="split admin-split">
+      <section class="card grow">
+        <h2>Clinics</h2>
+        {% if clinics %}
+        <div class="record-table admin-table">
+          <div class="record-head admin-row admin-row-clinics"><span>Name</span><span>Phone</span><span>Users</span><span>Patients</span><span>Status</span></div>
+          {% for clinic in clinics %}
+          <div class="record-row admin-row admin-row-clinics">
+            <span data-label="Name"><b>{{ clinic.name }}</b></span>
+            <span data-label="Phone">{{ clinic.phone or "—" }}</span>
+            <span data-label="Users">{{ clinic.user_count }}</span>
+            <span data-label="Patients">{{ clinic.patient_count }}</span>
+            <span data-label="Status" class="admin-status-cell">
+              <form method="post" action="/admin/clinics/{{ clinic.id }}/active" class="admin-toggle-form">
+                <input type="hidden" name="active" value="{{ 0 if clinic.is_active else 1 }}">
+                <button type="submit" class="status-toggle {{ 'is-on' if clinic.is_active else 'is-off' }}" aria-pressed="{{ 'true' if clinic.is_active else 'false' }}">
+                  {{ 'Active' if clinic.is_active else 'Inactive' }}
+                </button>
+              </form>
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty">No clinics yet.</p>
+        {% endif %}
+      </section>
+      <section class="card grow">
+        <h2>Clinic users</h2>
+        {% if clinic_users %}
+        <div class="record-table admin-table">
+          <div class="record-head admin-row admin-row-users"><span>Username</span><span>Name</span><span>Clinic</span><span>Status</span></div>
+          {% for user in clinic_users %}
+          <div class="record-row admin-row admin-row-users">
+            <span data-label="Username"><b>{{ user.username }}</b></span>
+            <span data-label="Name">{{ user.name }}</span>
+            <span data-label="Clinic">{{ user.clinic_name }}{% if not user.clinic_is_active %} <span class="pill pill-muted">clinic off</span>{% endif %}</span>
+            <span data-label="Status" class="admin-status-cell">
+              <form method="post" action="/admin/users/{{ user.id }}/active" class="admin-toggle-form">
+                <input type="hidden" name="active" value="{{ 0 if user.is_active else 1 }}">
+                <button type="submit" class="status-toggle {{ 'is-on' if user.is_active else 'is-off' }}" aria-pressed="{{ 'true' if user.is_active else 'false' }}">
+                  {{ 'Active' if user.is_active else 'Inactive' }}
+                </button>
+              </form>
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty">No clinic users yet.</p>
+        {% endif %}
+      </section>
+    </div>
+    </section>
+  </main>
+</div>
+<script src="/static/js/field-validation.js?v=30" defer></script>
+{% endblock %}

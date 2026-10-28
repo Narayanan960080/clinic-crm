@@ -1,0 +1,66 @@
+{% extends "base_public.html" %}
+{% block meta %}
+<meta name="robots" content="noindex, nofollow">
+{% endblock %}
+{% block body %}
+<div class="shell" id="shell">
+  <button class="nav-scrim" type="button" id="nav-scrim" aria-label="Close menu" tabindex="-1"></button>
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="/dashboard">
+      {% with size=32 %}{% include "partials/mark.html" %}{% endwith %}
+      <strong>Clinic CRM</strong>
+    </a>
+    <nav class="side-nav" aria-label="Clinic">
+      {% set nav = [
+        ("dashboard", "Dashboard", "/dashboard"),
+        ("patients", "Patients", "/patients"),
+        ("appointments", "Appointments", "/appointments"),
+        ("account", "Account", "/account"),
+        ("support", "Support", "/support")
+      ] %}
+      {% for key, label, href in nav %}
+      <a href="{{ href }}" {% if active == key %}aria-current="page"{% endif %}>{{ label }}</a>
+      {% endfor %}
+    </nav>
+    <div class="side-foot">
+      <b>Quantamloop Innovation</b>
+      Private Limited
+    </div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <button class="btn btn-line menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="sidebar">Menu</button>
+      <form action="/patients" method="get" role="search">
+        <label class="sr-only" for="top-search">Search patients, appointments</label>
+        <input class="search" id="top-search" name="q" type="search" placeholder="Search" value="{{ q|default('') }}">
+      </form>
+      <a class="who" href="/account">
+        <span class="avatar" aria-hidden="true">DR</span>
+        <span class="who-meta"><b>{{ session_username|default('User') }}</b><span>{{ clinic_name|default('Clinic') }}</span></span>
+      </a>
+    </header>
+    <main class="content" id="main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+<script type="application/json" id="patient-directory">{{ patients_json|safe }}</script>
+<dialog class="sheet" id="patient-sheet" aria-labelledby="sheet-title">
+  <div class="sheet-head">
+    <div>
+      <h2 id="sheet-title">Patient</h2>
+      <p class="hint" id="sheet-when"></p>
+    </div>
+    <button class="btn btn-line" type="button" id="sheet-close">Close</button>
+  </div>
+  <p class="banner" id="sheet-state" hidden></p>
+  <div class="sheet-actions">
+    <button class="btn" type="button" id="sheet-attended">Attended</button>
+    <button class="btn btn-line" type="button" id="sheet-cancel">Cancel</button>
+    <a class="btn btn-line" id="sheet-record" href="/history">Full record</a>
+  </div>
+  <div id="sheet-facts"></div>
+</dialog>
+<script src="/static/js/field-validation.js?v=27" defer></script>
+<script src="/static/js/app.js?v=27" defer></script>
+{% endblock %}

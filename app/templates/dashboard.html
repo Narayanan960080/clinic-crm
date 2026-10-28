@@ -1,0 +1,62 @@
+{% extends "base_app.html" %}
+{% block title %}Dashboard · Clinic CRM{% endblock %}
+{% block content %}
+<section class="greet">
+  <div>
+    <h1>Hello, Dr. Name!</h1>
+    <p>Here is your clinic overview.</p>
+  </div>
+  <a class="btn" href="/patients/new">New patient</a>
+</section>
+<section class="stats" aria-label="Clinic summary">
+  <article class="stat"><span>Total patients</span><b id="dash-total-patients">{{ stats.total }}</b></article>
+  <article class="stat"><span>Today’s appointments</span><b>{{ stats.today_appointments }}</b></article>
+  <article class="stat"><span>New this week</span><b>{{ stats.new_week }}</b></article>
+  <article class="stat"><span>Pending follow-ups</span><b>{{ stats.follow_ups }}</b></article>
+</section>
+<section class="dash-grid">
+  <article class="card">
+    <h2>Appointments this week</h2>
+    {% for item in week_appts %}
+    <div class="list-row" data-patient="{{ item.patient }}" data-time="{{ item.time }}" data-doctor="{{ item.doctor }}" data-reason="{{ item.reason }}" data-payment="{{ item.payment }}" data-date="{{ item.date }}" data-status="{{ item.status }}">
+      <button type="button" class="appt-open" aria-label="Open {{ item.patient }} at {{ item.time }}"><b>{{ item.date }} · {{ item.time }} · {{ item.patient }}</b><span>{{ item.reason }} · {{ item.doctor }}</span></button>
+      <span class="pill {{ item.payment_class }}">{{ item.payment }}</span>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <span class="empty-state-icon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+      <p>No upcoming appointments this week.</p>
+      <a class="btn btn-line" href="/appointments">Book on calendar</a>
+    </div>
+    {% endfor %}
+    {% if week_appts %}<a class="btn btn-line" href="/appointments">View calendar</a>{% endif %}
+  </article>
+  <article class="card">
+    <h2>Upcoming today</h2>
+    {% for item in today_upcoming %}
+    <div class="list-row" data-id="{{ item.id }}" data-patient="{{ item.patient }}" data-time="{{ item.time }}" data-doctor="{{ item.doctor }}" data-reason="{{ item.reason }}" data-payment="{{ item.payment }}" data-date="{{ item.date }}" data-status="{{ item.status }}">
+      <button type="button" class="appt-open" aria-label="Open {{ item.patient }} at {{ item.time }}"><b>{{ item.time }} · {{ item.patient }}</b><span>{{ item.reason }}</span></button>
+      <span class="row-pills"><span class="pill {{ item.visit_class }}">{{ item.visit_status }}</span><span class="pill {{ item.payment_class }}">{{ item.payment }}</span></span>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <span class="empty-state-icon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span>
+      <p>No patients scheduled for today.</p>
+      <span class="hint">Your day is clear — book a visit when you are ready.</span>
+      <a class="btn btn-line" href="/appointments#quick-book">Book appointment</a>
+    </div>
+    {% endfor %}
+  </article>
+  <article class="card">
+    <h2>Recent registrations</h2>
+    {% for person in recent %}
+    <div class="list-row">
+      <div><b>{{ person.name }}</b><span>{{ person.phone }} · {{ person.mrn }}</span></div>
+    </div>
+    {% else %}
+    <p class="empty">No new patients yet.</p>
+    {% endfor %}
+    <a class="btn btn-line" href="/patients">All patients</a>
+  </article>
+</section>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base_app.html" %}
+{% block title %}Support · Clinic CRM{% endblock %}
+{% block content %}
+<div>
+  <h1>CRM access and support</h1>
+  <p class="sub">Basic support from the Quantamloop Innovation team.</p>
+</div>
+<section class="help-row">
+  <article class="help-card"><b>Getting started</b><span>Short guides for registration, scheduling and records.</span></article>
+  <article class="help-card"><b>Email support</b><span>Reach our team at support@quantamloop.example.</span></article>
+  <article class="help-card"><b>Support hours</b><span>Monday to Saturday, 9:00 am – 6:00 pm IST.</span></article>
+</section>
+<div class="split">
+  <form class="card grow" id="support-form" novalidate>
+    <h2>Send us a message</h2>
+    <div class="field"><label for="s1">Subject</label><input id="s1" name="subject" type="text" placeholder="What do you need help with?" required></div>
+    <div class="field" style="margin-top:16px"><label for="s2">Message</label><textarea id="s2" name="message" placeholder="Describe the issue" required></textarea></div>
+    <p class="banner" id="support-ok" hidden role="status">Message sent. We will reply during support hours.</p>
+    <p class="banner error" id="support-error" hidden></p>
+    <div class="form-actions"><button class="btn" type="submit">Send message</button></div>
+  </form>
+  <section class="card faq">
+    <h2>Common questions</h2>
+    <details>
+      <summary>How do I register a new patient?</summary>
+      <p>Open Patients and choose New patient. Fill in the name, date of birth and phone, then save.</p>
+    </details>
+    <details>
+      <summary>How do I book or reschedule an appointment?</summary>
+      <p>Open Appointments and use Quick book. To move a visit, open the patient history and choose Reschedule.</p>
+    </details>
+    <details>
+      <summary>Where can I see a patient’s history?</summary>
+      <p>Open History, or choose a name in the patient list. Visits, prescriptions and documents are on that page.</p>
+    </details>
+    <details>
+      <summary>How do I change my password?</summary>
+      <p>Open Account, enter the current password and a new one, then choose Update password.</p>
+    </details>
+  </section>
+</div>
+{% endblock %}
